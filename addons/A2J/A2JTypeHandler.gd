@@ -1,8 +1,8 @@
 @abstract class_name A2JTypeHandler extends RefCounted
 
-## Convert a value to an Any-JSON object. Can connect to [code]A2J.to_json[/code] for recursion.
-@abstract func to_json(value, ruleset:Dictionary) -> Dictionary[String,Variant]
-## Convert an Any-JSON object back into the original item. Can connect to [code]A2J.from_json[/code] for recursion.
+## Convert a value to an AJSON object. Can connect to [code]A2J.to_json[/code] for recursion.
+@abstract func to_json(value, ruleset:Dictionary)
+## Convert an AJSON object back into the original item. Can connect to [code]A2J.from_json[/code] for recursion.
 @abstract func from_json(value, ruleset:Dictionary)
 
 const a2jError := 'A2J Error: '

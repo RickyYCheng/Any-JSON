@@ -1,8 +1,8 @@
 @tool
-## Main API for Anything to JSON.
-## Call [code]init[/code] before using!
+## Main API for the Any-JSON plugin.
 class_name A2J extends RefCounted
 
+## Primitive types that do not require handlers.
 const primitive_types:Array[Variant.Type] = [
 	TYPE_BOOL,
 	TYPE_INT,
@@ -10,6 +10,7 @@ const primitive_types:Array[Variant.Type] = [
 	TYPE_STRING,
 ]
 
+## The default ruleset used when calling [code]to_json[/code].
 const default_ruleset_to := {
 	'allowed_types': [
 		'Object',
@@ -17,7 +18,7 @@ const default_ruleset_to := {
 		'Callable',
 	],
 	'property_exclusions': {
-		# Exclude all resource properties when converting to Any-JSON.
+		# Exclude all resource properties when converting to AJSON.
 		'Resource': [
 			'resource_local_to_scene',
 			'resource_path',
@@ -26,14 +27,18 @@ const default_ruleset_to := {
 			'resource_priority',
 		],
 	},
+	'convert_properties_to_references': {}, # Define property names that will be converted to references instead of being converted to JSON representations of that property.
+	'convert_named_resources_to_references': false, # Resource objects will be converted to a named reference with the "resource_name" property as the name.
 }
 
+## The default ruleset used when calling [code]from_json[/code].
 const default_ruleset_from := {
 	'allowed_types': default_ruleset_to.allowed_types,
 	'property_exclusions': {
 		# Exclude all resource properties when converting from Any-JSON.
 		'Resource': default_ruleset_to.property_exclusions.Resource,
 	},
+	'named_references': {}, # Define named references & the value to assign to them.
 }
 
 const no_handler_error := 'No handler implemented for type "%s". Make a handler with the abstract A2JTypeHandler class.'
@@ -42,12 +47,13 @@ const no_handler_error := 'No handler implemented for type "%s". Make a handler 
 ## A2JTypeHandlers that can be used.
 ## You can add custom type handlers here.
 static var type_handlers:Dictionary[String,A2JTypeHandler] = {
+	'A2JReference': A2JReferenceTypeHandler.new(),
 	'Object': A2JObjectTypeHandler.new(),
 	'Array': A2JArrayTypeHandler.new(),
 	'Dictionary': A2JDictionaryTypeHandler.new(),
 }
 
-## Set of recognized objects used for conversion to & from Any-JSON.
+## Set of recognized objects used for conversion to & from AJSON.
 ## You can safely add or remove objects from this registry as you see fit.
 ## [br][br]
 ## Is equipped with many (but not all) built-in Godot classes by default.
@@ -80,12 +86,15 @@ static var object_registry:Dictionary[StringName,Object] = {
 }
 
 
-## Convert [param value] to an Any-JSON object. Only objects in the Object Registry can be converted.
-static func to_json(value:Variant, ruleset=default_ruleset_to) -> Dictionary[String,Variant]:
+## Convert [param value] to an AJSON object or a JSON friendly value. If [param value] is an Object, only objects in the Object Registry can be converted.
+static func to_json(value:Variant, ruleset=default_ruleset_to) -> Variant:
 	var type := type_string(typeof(value))
 	if type == 'Dictionary':
 		type = value.get('.type', '').split(':')[0]
 		if type == '': type = 'Dictionary'
+	
+	if typeof(value) in primitive_types:
+		return value
 
 	var handler = type_handlers.get(type, null)
 	if handler == null:
@@ -96,8 +105,7 @@ static func to_json(value:Variant, ruleset=default_ruleset_to) -> Dictionary[Str
 	return handler.to_json(value, ruleset)
 
 
-## Convert [param value] to it's original object.
-## [param value] should be Dictionary or Array.
+## Convert [param value] to it's original value.
 static func from_json(value, ruleset=default_ruleset_from) -> Variant:
 	var type: String
 	var handler
@@ -108,6 +116,9 @@ static func from_json(value, ruleset=default_ruleset_from) -> Variant:
 
 	elif value is Array:
 		type = 'Array'
+
+	elif typeof(value) in primitive_types:
+		return value
 
 	handler = type_handlers.get(type, null)
 	if handler == null:

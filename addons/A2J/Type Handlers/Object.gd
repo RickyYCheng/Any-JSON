@@ -1,14 +1,21 @@
 class_name A2JObjectTypeHandler extends A2JTypeHandler
 
+## Named references that have been produced from conversion to Any-JSON.
+## Cleared every time [code]to_json[/code] is called.
+var produced_references:Array[String] = []
+
 
 func _init() -> void:
 	error_strings = [
 		'Object not defined in registry.',
-		'"property_exclusions" in ruleset should be structured as follows: Dictionary[Array[String]].'
+		'"property_exclusions" in ruleset should be structured as follows: Dictionary[String,Array[String]].',
+		'"convert_named_resources_to_references" in ruleset should be a boolean value.',
+		'"convert_properties_to_references" in ruleset should be structured as follows: Dictionary[String,Dictionary[String,String]].',
 	]
 
 
 func to_json(object:Object, ruleset:Dictionary) -> Dictionary[String,Variant]:
+	produced_references.clear() # Reset previously produced references.
 	var object_class: String
 	var script:Script = object.get_script()
 	if script != null:
@@ -26,19 +33,28 @@ func to_json(object:Object, ruleset:Dictionary) -> Dictionary[String,Variant]:
 		'.type': 'Object:%s' % object_class, 
 	}
 
+	# Get exceptions from ruleset.
+	var convert_named_resource = ruleset.get('convert_named_resources_to_references', false)
+	if convert_named_resource is not bool:
+		report_error(2)
+		convert_named_resource = false
+	var properties_to_exclude:Array[String] = _get_properties_to_exclude(object, ruleset)
+	var properties_to_reference:Dictionary[String,String] = _get_properties_to_reference(object, ruleset)
 	# Convert all properties.
-	var excluded_properties:Array[String] = _get_excluded_properties(object, ruleset)
 	for property in object.get_property_list():
-		if property.name in excluded_properties: continue
-		var property_value = object.get(property.name)
+		if property.name in properties_to_exclude: continue # Exclude.
+		# Reference.
+		if property.name in properties_to_reference:
+			var reference_name = properties_to_reference[property.name]
+			result.set(property.name, _make_reference(reference_name))
+			continue
 		# Exclude null values.
+		var property_value = object.get(property.name)
 		if property_value == null: continue
 		# Convert value if not a primitive type.
 		var new_value
 		if typeof(property_value) not in A2J.primitive_types:
 			new_value = A2J.to_json(property_value, ruleset)
-			if new_value.get('.primitive', false) == true:
-				new_value = new_value.get('value')
 		else:
 			new_value = property_value
 		# Set new value.
@@ -58,16 +74,14 @@ func from_json(json:Dictionary[String,Variant], ruleset:Dictionary) -> Object:
 	registered_object = registered_object as Object
 
 	var result:Object = registered_object.new()
-	var excluded_properties:Array[String] = _get_excluded_properties(result, ruleset)
+	var properties_to_exclude:Array[String] = _get_properties_to_exclude(result, ruleset)
 	for key in json:
 		if key.begins_with('.'): continue
-		if key in excluded_properties: continue
+		if key in properties_to_exclude: continue
 		var value = json[key]
 		var new_value
 		if typeof(value) not in A2J.primitive_types:
 			new_value = A2J.from_json(value, ruleset)
-			if new_value is Dictionary && new_value.get('.primitive') == true:
-				new_value = new_value.get('value')
 		else:
 			new_value = value
 		# Set value as metadata.
@@ -83,7 +97,7 @@ func from_json(json:Dictionary[String,Variant], ruleset:Dictionary) -> Object:
 
 ## Assemble list of properties to exclude.
 ## [param object] is the object to use [code]is_class[/code] on.
-func _get_excluded_properties(object:Object, ruleset:Dictionary) -> Array[String]:
+func _get_properties_to_exclude(object:Object, ruleset:Dictionary) -> Array[String]:
 	var property_exclusions_in_ruleset:Dictionary = ruleset.get('property_exclusions',{})
 	# Throw error if property exclusions is not the expected type.
 	if property_exclusions_in_ruleset is not Dictionary:
@@ -93,13 +107,50 @@ func _get_excluded_properties(object:Object, ruleset:Dictionary) -> Array[String
 	# Iterate on every list of exclusions.
 	var excluded_properties:Array[String] = []
 	for key in property_exclusions_in_ruleset:
-		if object.is_class(key):
-			var list = property_exclusions_in_ruleset[key]
-			# Throw error if value is not the expected type.
-			if list is not Array:
-				report_error(1)
-				return []
-			# Add to excluded properties.
-			excluded_properties.append_array(list)
+		if not object.is_class(key): continue
+		var list = property_exclusions_in_ruleset[key]
+		# Throw error if value is not the expected type.
+		if list is not Array:
+			report_error(1)
+			return []
+		# Add to excluded properties.
+		excluded_properties.append_array(list)
 
 	return excluded_properties
+
+
+## Assemble list of properties to be converted to named references.
+## [param object] is the object to use [code]is_class[/code] on.
+func _get_properties_to_reference(object:Object, ruleset:Dictionary) -> Dictionary[String,String]:
+	var properties_to_reference_in_ruleset = ruleset.get('convert_properties_to_references',{})
+	if properties_to_reference_in_ruleset is not Dictionary:
+		report_error(3)
+		return {}
+
+	# Iterate on every list.
+	var properties_to_reference:Dictionary[String,String] = {}
+	for key in properties_to_reference_in_ruleset:
+		if not object.is_class(key): continue
+		var list = properties_to_reference_in_ruleset[key]
+		# Throw error if value is not the expected type.
+		if list is not Dictionary:
+			report_error(3)
+			return {}
+		# Add to properties to reference.
+		for key_ in list:
+			var value = list[key_]
+			if value is not String:
+				report_error(3)
+				return {}
+			properties_to_reference.set(key_, value)
+
+	return properties_to_reference
+
+
+func _make_reference(name:String) -> Dictionary[String,String]:
+	var result:Dictionary[String,String] = {
+		'.type': 'A2JReference',
+		'value': name,
+	}
+	produced_references.append(name)
+	return result

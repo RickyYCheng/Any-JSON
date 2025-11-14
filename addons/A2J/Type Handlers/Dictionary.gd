@@ -9,10 +9,7 @@ func _init() -> void:
 
 
 func to_json(dict:Dictionary, ruleset:Dictionary) -> Dictionary[String,Variant]:
-	var result:Dictionary[String,Variant] = {
-		'.primitive': true,
-		'value': {},
-	}
+	var result:Dictionary[String,Variant] = {}
 	var non_standard_keys
 
 	# Convert all items.
@@ -26,12 +23,10 @@ func to_json(dict:Dictionary, ruleset:Dictionary) -> Dictionary[String,Variant]:
 		var new_value
 		if typeof(value) not in A2J.primitive_types:
 			new_value = A2J.to_json(value, ruleset)
-			if new_value.get('.primitive') == true:
-				new_value = new_value.get('value')
 		else:
 			new_value = value
 		# Set new value.
-		result.value.set(key, new_value)
+		result.set(key, new_value)
 	
 	return result
 
@@ -43,8 +38,6 @@ func from_json(json, ruleset:Dictionary) -> Dictionary:
 		var new_value
 		if typeof(value) not in A2J.primitive_types:
 			new_value = A2J.from_json(value, ruleset)
-			if new_value is Dictionary && new_value.get('.primitive') == true:
-				new_value = new_value.get('value')
 		else:
 			new_value = value
 		# Append value

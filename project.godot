@@ -10,8 +10,8 @@ config_version=5
 
 [application]
 
-config/name="Anything to JSON"
-config/description="Example project for Anything to JSON."
+config/name="Any-JSON"
+config/description="Example project for Any-JSON."
 config/features=PackedStringArray("4.5", "GL Compatibility")
 
 [editor_plugins]
