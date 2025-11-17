@@ -1,4 +1,4 @@
-## Only handles
+## Handles serialization for the Dictionary type.
 class_name A2JDictionaryTypeHandler extends A2JTypeHandler
 
 

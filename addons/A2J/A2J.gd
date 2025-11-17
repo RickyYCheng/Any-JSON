@@ -68,6 +68,12 @@ static var type_handlers:Dictionary[String,A2JTypeHandler] = {
 	'StringName': _misc_type_handler,
 	'NodePath': _misc_type_handler,
 	'Color': _misc_type_handler,
+	'Plane': _misc_type_handler,
+	'Quaternion': _misc_type_handler,
+	'Rect2': _misc_type_handler,
+	'Rect2i': _misc_type_handler,
+	'AABB': _misc_type_handler,
+	'Basis': _misc_type_handler,
 }
 
 ## Set of recognized objects used for conversion to & from AJSON.

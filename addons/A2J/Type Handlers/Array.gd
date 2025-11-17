@@ -1,4 +1,4 @@
-## Only handles
+## Handles serialization for the Array type.
 class_name A2JArrayTypeHandler extends A2JTypeHandler
 
 

@@ -1,4 +1,3 @@
-## Only handles
 class_name A2JReferenceTypeHandler extends A2JTypeHandler
 
 

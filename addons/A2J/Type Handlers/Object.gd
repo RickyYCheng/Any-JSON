@@ -1,3 +1,4 @@
+## Handles serialization for the Object type.
 class_name A2JObjectTypeHandler extends A2JTypeHandler
 
 ## Named references that have been produced from conversion to Any-JSON.
@@ -65,7 +66,7 @@ func to_json(object:Object, ruleset:Dictionary) -> Dictionary[String,Variant]:
 	return result
 
 
-func from_json(json:Dictionary[String,Variant], ruleset:Dictionary) -> Object:
+func from_json(json:Dictionary, ruleset:Dictionary) -> Object:
 	var object_class:String = json.get('.type', '')
 	assert(object_class.begins_with('Object:'), 'JSON ".type" must be "Object:<class_name>".')
 	object_class = object_class.replace('Object:','')

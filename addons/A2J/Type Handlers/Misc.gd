@@ -3,6 +3,12 @@
 ## [br]- StringName
 ## [br]- NodePath
 ## [br]- Color
+## [br]- Plane
+## [br]- Quaternion
+## [br]- Rect2
+## [br]- Rect2i
+## [br]- AABB
+## [br]- Basis
 class_name A2JMiscTypeHandler extends A2JTypeHandler
 
 
@@ -24,6 +30,21 @@ func to_json(value, ruleset:Dictionary) -> Dictionary[String,Variant]:
 
 	elif value is Color:
 		result.value = [value.r, value.g, value.b, value.a]
+
+	elif value is Plane:
+		result.value = [value.x, value.y, value.z, value.d]
+
+	elif value is Quaternion:
+		result.value = [value.x, value.y, value.z, value.w]
+
+	elif value is Rect2 or value is Rect2i:
+		result.value = [value.position.x, value.position.y, value.size.x, value.size.y]
+
+	elif value is AABB:
+		result.value = [value.position.x, value.position.y, value.position.z, value.size.x, value.size.y, value.size.z]
+
+	elif value is Basis:
+		result.value = [value.x.x, value.x.y, value.x.z, value.y.x, value.y.y, value.y.z, value.z.x, value.z.y, value.z.z]
 
 	# Throw error if not an expected type.
 	else:
@@ -50,13 +71,46 @@ func from_json(json:Dictionary, ruleset:Dictionary) -> Variant:
 
 	elif type == 'Color':
 		if value is not Array or value.size() != 4: report_error(1); return null
-		var contains_only_numbers:bool = value.all(func(item) -> bool:
-			return item is int or item is float
-		)
-		if not contains_only_numbers: report_error(1); return null
+		if not _is_number_array(value): report_error(1); return null
 		return Color(value[0], value[1], value[2], value[3])
+
+	elif type == 'Plane':
+		if value is not Array or value.size() != 4: report_error(1); return null
+		if not _is_number_array(value): report_error(1); return null
+		return Plane(Vector3(value[0], value[1], value[2]), value[3])
+
+	elif type == 'Quaternion':
+		if value is not Array or value.size() != 4: report_error(1); return null
+		if not _is_number_array(value): report_error(1); return null
+		return Quaternion(value[0], value[1], value[2], value[3])
+
+	elif type == 'Rect2':
+		if value is not Array or value.size() != 4: report_error(1); return null
+		if not _is_number_array(value): report_error(1); return null
+		return Rect2(value[0], value[1], value[2], value[3])
+
+	elif type == 'Rect2i':
+		if value is not Array or value.size() != 4: report_error(1); return null
+		if not _is_number_array(value): report_error(1); return null
+		return Rect2i(int(value[0]), int(value[1]), int(value[2]), int(value[3]))
+
+	elif type == 'AABB':
+		if value is not Array or value.size() != 6: report_error(1); return null
+		if not _is_number_array(value): report_error(1); return null
+		return AABB(Vector3(value[0], value[1], value[2]), Vector3(value[3], value[4], value[5]))
+
+	elif type == 'Basis':
+		if value is not Array or value.size() != 9: report_error(1); return null
+		if not _is_number_array(value): report_error(1); return null
+		return Basis(Vector3(value[0], value[1], value[2]), Vector3(value[3], value[4], value[5]), Vector3(value[6], value[7], value[8]))
 
 	# Throw error if no conditions match.
 	else:
 		report_error(1)
 		return null
+
+
+func _is_number_array(array:Array) -> bool:
+	return array.all(func(item) -> bool:
+		return item is int or item is float
+	)

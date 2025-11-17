@@ -1,4 +1,4 @@
-## Handles serialization for Vector2(i), Vector3(i), & Vector4(i).
+## Handles serialization for Vector2(i), Vector3(i), & Vector4(i) types.
 class_name A2JVectorTypeHandler extends A2JTypeHandler
 
 
