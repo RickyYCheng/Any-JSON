@@ -10,13 +10,15 @@ Godot 4.5 plugin to convert any Godot variant to raw JSON & back, with absolutel
 
 [![Release](https://img.shields.io/badge/Need_help%3F-gray?style=flat&logo=discord)](https://dsc.gg/sohp)
 
-# Simple run-down:
-This plugin can serialize absolutely any data type within Godot to raw readable JSON so long as the appropriate type handlers have been implemented. You can serialize any custom & built-in classes too, as long as they are listed in `A2J.object_registry`, most common objects are already registered by default, but custom classes & more obscure built-in classes need to be manually registered.
+# **Introduction:**
+This plugin can serialize absolutely any data type within Godot to raw readable JSON so long as the appropriate type handlers have been implemented. You can serialize any custom & built-in classes too.
 
-The original goal of this plugin was to have a way to serialize resources to independent JSON files (from within the editor) that can be stored on the disk with extreme flexibility when it comes to what & how things get converted.
+Any-JSON is very simple to use, no need to specify the type or class of the item you want to convert it is all handled automatically. Most common classes should already be supported, but if you run into an object with an unsupported class you can simply add that class to the `A2J.object_registry` & try again.
+
+After converting your item to an AJSON dictionary, you can use `JSON.stringify` to turn it into a raw text string but you will need to convert it back to a dictionary using `JSON.parse_string` if you want to convert it back to the original item.
 
 # **Features:**
-## All built-in types handled:
+## All types handled:
 All types listed below can be converted to JSON & back while preserving every detail.
 - Bool
 - Int
@@ -24,7 +26,7 @@ All types listed below can be converted to JSON & back while preserving every de
 - String
 - Object (both built-in & custom classes supported)
 - Array
-- Dictionary
+- Dictionary (any key type supported)
 - Vector2, Vector2i
 - Vector3, Vector3i
 - Vector4, Vector4i
@@ -46,7 +48,9 @@ All types listed below can be converted to JSON & back while preserving every de
 - Transform3D
 - Projection
 
-As of Godot 4.5 this is almost every `Variant.Type` available in GDScript that aren't run-time exclusive (like `RID`). If new types are added to GDScript you can add your own handler by extending `A2JTypeHandler` & adding an instance of the handler to `A2J.type_handler`.
+As of Godot 4.5 this is almost every `Variant.Type` available in GDScript that aren't run-time exclusive (like `RID`). If new types are added to GDScript you can add your own handler by extending `A2JTypeHandler` & adding an instance of the handler to `A2J.type_handlers`.
+
+**Note:** Most packed array types are converted to hexadecimal strings, so they will not be human readable. This might change in the future.
 
 Here are the types that will never be supported & their reasons:
 - Signal: signals are too complex due to all the moving parts & references. On top of that, there is no use case that comes to mind where saving this to disk would be useful.
