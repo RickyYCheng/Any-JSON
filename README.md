@@ -13,12 +13,28 @@ Godot 4.5 plugin to convert any Godot variant to raw JSON & back, with absolutel
 # **Introduction:**
 This plugin can serialize absolutely any data type within Godot to raw readable JSON so long as the appropriate type handlers have been implemented. You can serialize any custom & built-in classes too.
 
-Any-JSON is very simple to use, no need to specify the type or class of the item you want to convert it is all handled automatically. Most common classes should already be supported, but if you run into an object with an unsupported class you can simply add that class to the `A2J.object_registry` & try again.
+Any-JSON is very simple to use, no need for setup or specification. Most common classes should already be supported, but if you run into an object with an unsupported class you can simply add that class to the `A2J.object_registry` & try again. For finer control over how things get done, see [Rulesets](#rulesets).
 
 After converting your item to an AJSON dictionary, you can use `JSON.stringify` to turn it into a raw text string but you will need to convert it back to a dictionary using `JSON.parse_string` if you want to convert it back to the original item.
 
-# **Features:**
-## All types handled:
+# **Table of contents:**
+- [Features](#features)
+  - [Supported types](#all-types-handled)
+  - [Recursive](#nesting-all-the-way)
+  - [Modular](#modular)
+  - [Editor-ready](#editor-ready)
+  - [Rulesets](#rulesets)
+  - [Error logs](#error-logs)
+- [Limitations](#limitations)
+  - [Circular references](#circular-references)
+- [Examples](#example-usage)
+  - [Adding to object registry](#adding-to-object-registry)
+  - [Serializing to AJSON](#serializing-to-ajson)
+  - [Serializing back from AJSON](#serializing-back-from-ajson)
+  - [More...](./examples/)
+
+# Features
+## All types handled
 All types listed below can be converted to JSON & back while preserving every detail.
 - Bool
 - Int
@@ -56,14 +72,19 @@ Here are the types that will never be supported & their reasons:
 - Signal: signals are too complex due to all the moving parts & references. On top of that, there is no use case that comes to mind where saving this to disk would be useful.
 - RID: this type is exclusively used for run time resource identifiers & would not be useful to save, as stated in the GDScript documentation.
 
-## Error logging:
-There is a dedicated error logging system so you don't have to deal with obscure error messages or unexpected behavior when the plugin isn't used properly.
-## Modular & extendable:
+## Nesting all the way
+All children of the item you are converting are recursively serialized. This means you can convert entire scene trees & every single resource it uses if you wanted to.
+
+This is a big advantage over some other plugins.
+
+## Modular
 Everything is coded in GDScript across distinct classes & files, allowing for easy modification & extension.
-## Editor-ready:
+
+## Editor-ready
 Unlike the most common alternatives, Any-JSON can work in the editor so it can be used within other editor tools.
 A downside to `ResourceSaver` is that the resource path, UID, & other meta data are saved when used in the editor. This was one of the main drives for me to make Any-JSON, as this would not be viable for some of my purposes.
-## Rulesets:
+
+## Rulesets
 A "ruleset" can be supplied when converting to or from AJSON allowing fine control over serialization. Something you don't get with `var_to_str` & not as much with `ResourceSaver`.
 
 **Basic rules:**
@@ -78,12 +99,15 @@ A "ruleset" can be supplied when converting to or from AJSON allowing fine contr
 - `instantiator (Callable(object_class:String) -> Object)`: Used for implementing custom logic for object instantiation. Useful for instantiating with objects with arguments or changing values after instantiation. The returned object will be used to compare default values when converting to AJSON, & will be used as a base when converting from AJSON.
 - `midpoint (Callable(item:Variant, ruleset:Dictionary) -> bool)`: Called right before conversion for every variable & property including nested ones. Returning `true` will permit conversion, returning `false` will discard the conversion for that item.
 
-# **Limitations:**
-## Circular references:
+## Error logs
+Custom errors are printed to the console when serialization goes wrong. You can access a history of these errors through the `error_stack` property on type handlers that have `print_error` set to true.
+
+# Limitations
+## Circular references
 Serializing an object that has a property that can lead back to the original object is a circular reference & can cause infinite recursion if you are not aware & carful. To get around this, you can utilize the `property_references` rule.
 
-# **Example usage:**
-## Adding to object registry:
+# Example usage
+## Adding to object registry
 Simply add the name of the class & the class itself to the `A2J.object_registry` dictionary. Do not add an instance of the object to the registry.
 ```gdscript
 class custom_class_1:
@@ -101,7 +125,7 @@ A2J.object_registry.merge({
 ```
 In this case, we are using the `merge` method to add multiple objects while preserving all the default ones.
 
-## Serializing to AJSON:
+## Serializing to AJSON
 Just pass the item you want to serialize to the `A2J.to_json` method. You can provide a custom ruleset, otherwise it will use the default ruleset defined at `A2J.default_ruleset_to`.
 ```gdscript
 var literally_any_thing := Vector3(1,2,3)
