@@ -12,12 +12,8 @@ func to_json(array:Array, ruleset:Dictionary) -> Variant:
 	var result:Array = []
 	# Convert all items.
 	for value in array:
-		# Convert value if not a primitive type.
-		var new_value
-		if typeof(value) not in A2J.primitive_types:
-			new_value = A2J._to_json(value, ruleset)
-		else:
-			new_value = value
+		# Convert value.
+		var new_value = A2J._to_json(value, ruleset)
 		# Append new value.
 		result.append(new_value)
 	
@@ -36,17 +32,14 @@ func from_json(json, ruleset:Dictionary) -> Array:
 
 	var result:Array = []
 	var index:int = -1
-	for item in list:
+	for value in list:
 		index += 1
-		var new_value
-		if typeof(item) not in A2J.primitive_types:
-			new_value = A2J._from_json(item, ruleset)
-			# Pass unresolved reference off to be resolved ater all objects are serialized & present in the object stack.
-			if new_value is String && new_value == '_A2J_unresolved_reference':
-				A2J._process_next_pass_functions.append(_resolve_reference.bind(result, index, item))
-				continue
-		else:
-			new_value = item
+		# Convert value.
+		var new_value = A2J._from_json(value, ruleset)
+		# Pass unresolved reference off to be resolved ater all objects are serialized & present in the object stack.
+		if new_value is String && new_value == '_A2J_unresolved_reference':
+			A2J._process_next_pass_functions.append(_resolve_reference.bind(result, index, value))
+			continue
 		# Append value
 		result.append(new_value)
 

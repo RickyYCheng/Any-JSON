@@ -16,6 +16,7 @@ const default_ruleset_to := {
 	'type_exclusions': [
 		'Callable',
 	],
+	'type_inclusions': [],
 	'property_exclusions': {
 		# Exclude all resource properties when converting to AJSON.
 		'Resource': [
@@ -26,10 +27,12 @@ const default_ruleset_to := {
 			'resource_priority',
 		],
 	},
+	'property_inclusions': {},
 	'exclude_private_properties': true, # Exclude properties that start with an underscore "_".
 	'exclude_properties_set_to_default': true, # Exclude properties whoms values are the same as the default of that property. This is used to reduce the amount of data we have to store, but isn't recommended if the defaults of class properties are expected to change.
 	'property_references': {}, # Property names that will be converted to references instead of being converted to JSON representations of that property.
 	'instantiator_arguments': {}, # Arguments that will be passed to the object's `new` method. 
+	'fppe_mitigation': false, # Floating point precision error mitigation.
 }
 
 ## The default ruleset used when calling [code]from_json[/code].
@@ -42,7 +45,7 @@ const default_ruleset_from := {
 
 const error_strings := [
 	'No handler implemented for type "~~". Make a handler with the abstract A2JTypeHandler class.',
-	'"type_exclusions" in ruleset should be structured as follows: Array[String].',
+	'"type_exclusions" & "type_inclusions" in ruleset should be structured as follows: Array[String].',
 ]
 
 # Template for instantiator function.
@@ -164,18 +167,13 @@ static func _to_json(value:Variant, ruleset=default_ruleset_to) -> Variant:
 		type = value.get('.type', '').split(':')[0]
 		if type == '': type = 'Dictionary'
 
-	# Check if type is in type exclusions.
-	var type_exclusions = ruleset.get('type_exclusions', [])
-	# Throw error if type exclusions is not an array.
-	if type_exclusions is not Array:
-		report_error(1)
+	# If type excluded, return null.
+	if _type_excluded(type, ruleset):
 		return null
-	# If type is excluded, return null.
-	if type in type_exclusions:
-		return null
-
 	# If type is primitive, return the value unchanged.
 	if typeof(value) in primitive_types:
+		if value is float && ruleset.get('fppe_mitigation'):
+			value = snappedf(value, 0.00000001)
 		return value
 
 	# Get type handler.
@@ -216,16 +214,9 @@ static func _from_json(value, ruleset=default_ruleset_from) -> Variant:
 	elif value is Array:
 		type = 'Array'
 
-	# Check if type is in type exclusions.
-	var type_exclusions = ruleset.get('type_exclusions', [])
-	# Throw error if type exclusions is not an array.
-	if type_exclusions is not Array:
-		report_error(1)
+	# If type excluded, return null.
+	if _type_excluded(type, ruleset):
 		return null
-	# If type is excluded, return null.
-	if type in type_exclusions:
-		return null
-
 	# If type is primitive, return value unchanged.
 	elif typeof(value) in primitive_types:
 		return value
@@ -246,6 +237,21 @@ static func _from_json(value, ruleset=default_ruleset_from) -> Variant:
 
 	# Return converted value.
 	return handler.from_json(value, ruleset)
+
+
+static func _type_excluded(type:String, ruleset:Dictionary) -> bool:
+	# Get type exclusions & inclusions.
+	var type_exclusions = ruleset.get('type_exclusions', [])
+	var type_inclusions = ruleset.get('type_inclusions', [])
+	# Throw error if is not an array.
+	if type_exclusions is not Array or type_inclusions is not Array:
+		report_error(1)
+		return true
+	# If type is excluded, return true.
+	if type in type_exclusions or (type_inclusions.size() > 0 && type not in type_inclusions):
+		return true
+
+	return false
 
 
 static func _init_handler_data() -> void:

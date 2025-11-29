@@ -17,12 +17,8 @@ func to_json(dict:Dictionary, ruleset:Dictionary) -> Dictionary[String,Variant]:
 		if key is not String:
 			key = A2J.to_json(key, ruleset)
 			key = '@:'+JSON.stringify(key,"",true,false)
-		# Convert value if not a primitive type.
-		var new_value
-		if typeof(value) not in A2J.primitive_types:
-			new_value = A2J._to_json(value, ruleset)
-		else:
-			new_value = value
+		# Convert value.
+		var new_value = A2J._to_json(value, ruleset)
 		# Set new value.
 		result.set(key, new_value)
 	
@@ -44,15 +40,11 @@ func from_json(json:Dictionary, ruleset:Dictionary) -> Dictionary[Variant,Varian
 				return {}
 			key = A2J._from_json(key_json, ruleset)
 		# Convert value.
-		var new_value
-		if typeof(value) not in A2J.primitive_types:
-			new_value = A2J._from_json(value, ruleset)
-			# Pass unresolved reference off to be resolved ater all objects are serialized & present in the object stack.
-			if new_value is String && new_value == '_A2J_unresolved_reference':
-				A2J._process_next_pass_functions.append(_resolve_reference.bind(result, key, value))
-				continue
-		else:
-			new_value = value
+		var new_value = A2J._from_json(value, ruleset)
+		# Pass unresolved reference off to be resolved ater all objects are serialized & present in the object stack.
+		if new_value is String && new_value == '_A2J_unresolved_reference':
+			A2J._process_next_pass_functions.append(_resolve_reference.bind(result, key, value))
+			continue
 		# Append value
 		result.set(key, new_value)
 

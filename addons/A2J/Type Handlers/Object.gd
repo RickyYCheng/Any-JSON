@@ -9,6 +9,7 @@ func _init() -> void:
 		'"convert_properties_to_references" in ruleset should be structured as follows: Dictionary[String,Dictionary[String,String]].',
 		'"instantiator_function" in ruleset should be structured as follows: Callable(registered_object:Object, object_class:String, args:Array=[]) -> Object.',
 		'"instantiator_arguments" in rulset should be structured as follows: Dictionary[String,Array].',
+		'"property_inclusions" in ruleset should be structured as follows: Dictionary[String,Array[String]].',
 	]
 	init_data = {
 		'ids_to_objects': {},
@@ -57,11 +58,15 @@ func to_json(object:Object, ruleset:Dictionary) -> Dictionary[String,Variant]:
 
 	# Get exceptions from ruleset.
 	var properties_to_exclude:Array[String] = _get_properties_to_exclude(object, ruleset)
+	var properties_to_include = _get_properties_to_include(object, ruleset)
+	var props_to_include_temp = ruleset.get('properties_inclusions', {})
+	var do_properties_to_include = (props_to_include_temp is Dictionary && not props_to_include_temp.is_empty())
 	var properties_to_reference:Dictionary[String,String] = _get_properties_to_reference(object, ruleset)
 	# Convert all properties.
 	for property in object.get_property_list():
 		if property.name in properties_to_exclude: continue # Exclude.
 		if property.name.begins_with('_') && ruleset.get('exclude_private_properties'): continue
+		if do_properties_to_include && property.name not in properties_to_include: continue
 		# Reference is on properties to reference list.
 		if property.name in properties_to_reference:
 			var reference_name = properties_to_reference[property.name]
@@ -73,12 +78,8 @@ func to_json(object:Object, ruleset:Dictionary) -> Dictionary[String,Variant]:
 		# Exclude values that are the same as default values.
 		if ruleset.get('exclude_properties_set_to_default'):
 			if property_value == default_object.get(property.name): continue
-		# Convert value if not a primitive type.
-		var new_value
-		if typeof(property_value) not in A2J.primitive_types:
-			new_value = A2J._to_json(property_value, ruleset)
-		else:
-			new_value = property_value
+		# Convert value.
+		var new_value = A2J._to_json(property_value, ruleset)
 		# Don't store null values.
 		if new_value == null: continue
 		# Set new value.
@@ -101,6 +102,9 @@ func from_json(json:Dictionary, ruleset:Dictionary) -> Object:
 	# Convert all values in the dictionary.
 	var result:Object = _get_default_object(registered_object, object_class, ruleset)
 	var properties_to_exclude:Array[String] = _get_properties_to_exclude(result, ruleset)
+	var properties_to_include = _get_properties_to_include(result, ruleset)
+	var props_to_include_temp = ruleset.get('properties_inclusions', {})
+	var do_properties_to_include = (props_to_include_temp is Dictionary && not props_to_include_temp.is_empty())
 	# Sort keys to prioritize script property.
 	var keys = json.keys()
 	keys.sort_custom(func(a,b) -> bool:
@@ -110,14 +114,13 @@ func from_json(json:Dictionary, ruleset:Dictionary) -> Object:
 		if key.begins_with('.'): continue
 		if key in properties_to_exclude: continue
 		if key.begins_with('_') && ruleset.get('exclude_private_properties'): continue
+		if do_properties_to_include && key not in properties_to_include: continue
 		var value = json[key]
-		var new_value = value
-		if typeof(value) not in A2J.primitive_types:
-			new_value = A2J._from_json(value, ruleset)
-			# Pass unresolved reference off to be resolved ater all objects are serialized & present in the object stack.
-			if new_value is String && new_value == '_A2J_unresolved_reference':
-				A2J._process_next_pass_functions.append(_resolve_reference.bind(result, key, value))
-				continue
+		var new_value = A2J._from_json(value, ruleset)
+		# Pass unresolved reference off to be resolved ater all objects are serialized & present in the object stack.
+		if new_value is String && new_value == '_A2J_unresolved_reference':
+			A2J._process_next_pass_functions.append(_resolve_reference.bind(result, key, value))
+			continue
 		# Set value as metadata.
 		if key.begins_with('metadata/'):
 			result.set_meta(key.replace('metadata/',''), new_value)
@@ -169,6 +172,30 @@ func _get_properties_to_exclude(object:Object, ruleset:Dictionary) -> Array[Stri
 		excluded_properties.append_array(list)
 
 	return excluded_properties
+
+
+## Assemble list of properties to include.
+## [param object] is the object to use [code]is_class[/code] on.
+func _get_properties_to_include(object:Object, ruleset:Dictionary) -> Array[String]:
+	var property_inclusions_in_ruleset:Dictionary = ruleset.get('property_inclusions',{})
+	# Throw error if property inclusions is not the expected type.
+	if property_inclusions_in_ruleset is not Dictionary:
+		report_error(5)
+		return []
+
+	# Iterate on every list of inclusions.
+	var included_properties:Array[String] = []
+	for key in property_inclusions_in_ruleset:
+		if not object.is_class(key): continue
+		var list = property_inclusions_in_ruleset[key]
+		# Throw error if value is not the expected type.
+		if list is not Array:
+			report_error(5)
+			return []
+		# Add to included properties.
+		included_properties.append_array(list)
+
+	return included_properties
 
 
 ## Assemble list of properties to be converted to named references.

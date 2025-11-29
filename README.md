@@ -27,6 +27,7 @@ After converting your item to an AJSON dictionary, you can use `JSON.stringify` 
   - [Error logs](#error-logs)
 - [Limitations](#limitations)
   - [Local classes](#handling-local-classes)
+- [Preserving data integrity](#preserving-data-integrity)
 - [Examples](#example-usage)
   - [Adding to object registry](#adding-to-object-registry)
   - [Serializing to AJSON](#serializing-to-ajson)
@@ -91,10 +92,13 @@ A downside to `ResourceSaver` is that the resource path, UID, & other meta data 
 A "ruleset" can be supplied when converting to or from AJSON allowing fine control over serialization. Something you don't get with `var_to_str` & not as much with `ResourceSaver`.
 
 **Basic rules:**
-- `type_exclusions (Array[String])`: Types of variables/properties that will be discarded.
+- `type_exclusions (Array[String])`: Types of variables that will be discarded.
+- `type_inclusions (Array[String])`: Types of variables that are allowed, all others will be discarded. If left empty, all types are permitted.
 - `property_exclusions (Dictionary[String,Array[String]])`: Names of properties that will not be recognized for each object. Can be used to exclude for example `Resource` specific properties like `resource_path`.
+- `property_inclusions (Dictionary[String,Array[String]])`: Names of properties that are permitted for each object. Used for only saving specific properties.
 - `exclude_private_properties (bool)`: Exclude properties that start with an underscore "_".
 - `exclude_properties_set_to_default (bool)`: Exclude properties whoms values are the same as the default of that property. This is used to reduce the amount of data we have to store, but isn't recommended if the defaults of class properties are expected to change.
+- `fppe_mitigation (bool)`: Limit the number of decimal places a floating point number can have to 9, to remove any floating point precision errors.
 
 **Advanced Rules:**
 - `property_references (Dictionary[String,Array[String]])`: Names of object properties that will be converted to a named reference when converting to JSON. Named values can be supplied during conversion back to the original item with `references`.
