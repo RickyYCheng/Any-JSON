@@ -25,8 +25,6 @@ After converting your item to an AJSON dictionary, you can use `JSON.stringify` 
   - [Editor-ready](#editor-ready)
   - [Rulesets](#rulesets)
   - [Error logs](#error-logs)
-- [Limitations](#limitations)
-  - [Local classes](#handling-local-classes)
 - [Preserving data integrity](#preserving-data-integrity)
 - [Examples](#example-usage)
   - [Adding to object registry](#adding-to-object-registry)
@@ -113,16 +111,6 @@ A "ruleset" can be supplied when converting to or from AJSON allowing fine contr
 ## Error logs
 Custom errors are printed to the console when serialization goes wrong. You can access a history of these errors through the `error_stack` property on type handlers that have `print_error` set to true.
 
-# Limitations
-## Handling local classes:
-All objects extending a custom class that is NOT globally available (defined as a child of a parent script) cannot be automatically identified as it has no global name.
-
-You will need to give your local classes the `_global_name` string constant which should be the same as the name you give it in the `A2J.object_registry`. The global name constant will allow Any-JSON to identify it when serializing.
-
-**What if I don't define `_global_name` on a local class?**
-
-Then the object will assume the class name of whatever the local class extends (RefCounted by default). No property data is discarded, it just cannot be applied to the correct class if you wish to convert it back from AJSON.
-
 # Preserving data integrity
 Here are a few rules you should follow so that you don't risk losing any data during or after serialization.
 - **Don't modify object indices:** Any-JSON uses index numbers to identify unique objects in resulting AJSON. These are necessary for resolving references & tampering with the indices will lead to incorrect deserialization of those references.
@@ -135,18 +123,16 @@ Here are a few rules you should follow so that you don't risk losing any data du
 Simply add the name of the class & the class itself to the `A2J.object_registry` dictionary. Do not add an instance of the object to the registry.
 ```gdscript
 class custom_class_1:
-  const _global_name := 'custom_class_1'
   var some_value:bool = true
 
 
 class custom_class_2:
-  const _global_name := 'custom_class_2'
   var some_value:int = 1
 
 
 A2J.object_registry.merge({
-  'custom_1': custom_class_1,
-  'custom_2': custom_class_2,
+  'custom_class_1': custom_class_1,
+  'custom_class_2': custom_class_2,
 })
 
 
@@ -154,7 +140,6 @@ A2J.object_registry.merge({
 # -----------------
 
 class custom_class_3:
-  const _global_name := 'custom_class_3'
   var some_value: int
 
   func _init(some_value:int) -> void:
@@ -191,7 +176,6 @@ else:
 # --------------------
 
 class custom_class:
-  const _global_name := 'custom_class'
   var_1:int = 1
   var_2:float = 0.5
 
@@ -204,6 +188,7 @@ var ruleset := {
   },
 }
 
+A2J.object_registry.set('custom_class', custom_class)
 result = A2J.to_json(custom_class.new(), ruleset)
 if result == null:
   print('something went wrong')

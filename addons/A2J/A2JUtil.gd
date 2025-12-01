@@ -14,14 +14,11 @@ static func get_object_class(object:Object) -> String:
 	var object_class: String
 	var script = object.get_script()
 	if script is Script:
-		object_class = script.get_global_name()
-		if object_class == '':
-			object_class = object.get_class()
-	else:
-		object_class = object.get_class()
-	# Class name override.
-	var object_class_override = object.get('_global_name')
-	if object_class_override is String:
-		object_class = object_class_override
+		# Search for class in `A2J.object_registry`.
+		var object_class_in_registry = A2J.object_registry.find_key(object.get_script())
+		if object_class_in_registry is StringName: object_class = object_class_in_registry
+
+		else: object_class = object.get_class()
+	else: object_class = object.get_class()
 
 	return object_class
