@@ -1,8 +1,7 @@
 @tool
 extends Node
-
 @export var item: Resource
-@export var file_path:String = 'res://compressed_ajson.dat'
+@export var file_path:String = 'res://examples/compression/output.dat'
 @export var compression_mode:FileAccess.CompressionMode = FileAccess.COMPRESSION_GZIP
 @export_tool_button('Save compressed') var compress = compress_callback
 @export_tool_button('Uncompress & print') var uncompress = uncompress_callback
