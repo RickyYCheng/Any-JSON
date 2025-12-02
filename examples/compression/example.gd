@@ -9,20 +9,27 @@ extends Node
 
 func compress_callback() -> void:
 	print_rich('[color=yellow][b]Converting exported [code]item[/code] variable to AJSON & storing as compressed (%s) file at [code]%s[/code]...' % [compression_mode ,file_path])
+	# Serialize `item` to stringified AJSON.
+	# Converting the dictionary itself to a binary format is tricky & most methods result in significantly more bytes than a JSON string.
 	var ajson = JSON.stringify(A2J.to_json(item))
+	# Open new file with compression mode.
 	var file = FileAccess.open_compressed(file_path, FileAccess.WRITE, compression_mode)
 	print(error_string(FileAccess.get_open_error()))
 	if file == null: return
-	file.store_string(ajson) # Store as a string, this is more size efficient than storing the raw dictionary as a variable in the file, or storing the the string as a var.
+	# Write our stringified AJSON to the file.
+	file.store_string(ajson)
 	file.close()
-	print_rich('[b]Uncompressed byte count:[/b] %s' % var_to_bytes(ajson).size())
+	# Print uncompressed vs compressed results.
+	print_rich('[b]Uncompressed byte count:[/b] %s' % ajson.to_utf8_buffer().size())
 	print_rich('[b]Compressed byte count:[/b] %s' % FileAccess.get_file_as_bytes(file_path).size())
 
 
 func uncompress_callback() -> void:
 	print_rich('[color=yellow][b]Uncompressing compressed (%s) file at [code]%s[/code]...' % [compression_mode ,file_path])
+	# Open file with compression mode.
 	var file = FileAccess.open_compressed(file_path, FileAccess.READ, compression_mode)
 	print(error_string(FileAccess.get_open_error()))
 	if file == null: return
+	# Parse the AJSON & print result.
 	var result = JSON.parse_string(file.get_as_text())
 	print_rich('[b]Output:[/b] %s' % result)
