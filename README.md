@@ -22,6 +22,7 @@ After converting your item to an AJSON dictionary, you can use `JSON.stringify` 
 - [Features](#features)
   - [Supported types](#all-types-handled)
   - [Recursive](#nesting-all-the-way)
+  - [Type-safe](#types-preserved)
   - [Modular](#modular)
   - [Editor-ready](#editor-ready)
   - [Rulesets](#rulesets)
@@ -60,8 +61,8 @@ All types listed below can be converted to JSON & back while preserving every de
 - Float
 - String
 - Object (both built-in & custom classes supported)
-- Array
-- Dictionary (any key type supported)
+- Array (any value type supported)
+- Dictionary (any key or value type supported)
 - Vector2, Vector2i
 - Vector3, Vector3i
 - Vector4, Vector4i
@@ -98,6 +99,13 @@ This is a big advantage over some other plugins.
 
 Any-JSON also handles circular references, this means a property can link back to the original object but it will simply be converted to a reference instead of triggering infinite recursion.
 This works by storing an index value (".i" property) for every *unique* object.
+
+## Types preserved
+Any-JSON automatically re-types values to the type of the property it is assigning to in an `Object`, meaning you can serialize objects with strict property types & still guarantee everything will be the correct type upon deserialization.
+
+Without automatic typing, Godot will fail to apply a standard `Array` value to a property of type `Array[int]`. The same applies to typed dictionaries & other typed values.
+
+The way Any-JSON ensures type safety is very efficient & doesn't require saving type data. During deserialization property type data is pulled from the class & that is used to tell the value what type it should be.
 
 ## Modular
 Everything is coded in GDScript across distinct classes & files, allowing for easy modification & extension.
