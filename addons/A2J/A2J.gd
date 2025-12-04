@@ -119,6 +119,8 @@ static var object_registry:Dictionary[StringName,Object] = {
 	'Theme':Theme, 'StyleBoxEmpty':StyleBoxEmpty, 'StyleBoxFlat':StyleBoxFlat, 'StyleBoxLine':StyleBoxLine, 'StyleBoxTexture':StyleBoxTexture,
 	# Multiplayer.
 	'SceneMultiplayer':SceneMultiplayer, 'MultiplayerPeer':MultiplayerPeer, 'OfflineMultiplayerPeer':OfflineMultiplayerPeer, 'ENetMultiplayerPeer':ENetMultiplayerPeer, 'MultiplayerPeerExtension':MultiplayerPeerExtension,
+	# InputEvent.
+	'InputEventAction':InputEventAction, 'InputEventJoypadButton':InputEventJoypadButton, 'InputEventJoypadMotion':InputEventJoypadMotion, 'InputEventKey':InputEventKey, 'InputEventMagnifyGesture':InputEventMagnifyGesture, 'InputEventMIDI':InputEventMIDI, 'InputEventMouseButton':InputEventMouseButton, 'InputEventMouseMotion':InputEventMouseMotion, 'InputEventPanGesture':InputEventPanGesture, 'InputEventScreenDrag':InputEventScreenDrag, 'InputEventScreenTouch':InputEventScreenTouch, 'InputEventShortcut':InputEventShortcut,
 	# Misc.
 	'BitMap':BitMap, 'BoneMap':BoneMap, 'ColorPalette':ColorPalette, 'Curve':Curve, 'Curve2D':Curve2D, 'Curve3D':Curve3D, 'CameraAttributes':CameraAttributes, 'CameraAttributesPhysical':CameraAttributesPhysical, 'CameraAttributesPractical':CameraAttributesPractical, 'LabelSettings':LabelSettings, 'SyntaxHighlighter':SyntaxHighlighter, 'CodeHighlighter':CodeHighlighter, 'Translation':Translation, 'OptimizedTranslation':OptimizedTranslation,
 	# Node.
