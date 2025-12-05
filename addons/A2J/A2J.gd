@@ -105,26 +105,27 @@ static var object_registry:Dictionary[StringName,Object] = {
 	'Material':Material, 'ShaderMaterial':ShaderMaterial, 'CanvasItemMaterial':CanvasItemMaterial, 'PanoramaSkyMaterial':PanoramaSkyMaterial, 'ParticleProcessMaterial':ParticleProcessMaterial, 'PhysicalSkyMaterial':PhysicalSkyMaterial, 'ProceduralSkyMaterial':ProceduralSkyMaterial, 'StandardMaterial3D':StandardMaterial3D, 'ORMMaterial3D':ORMMaterial3D, 'FogMaterial':FogMaterial, 'PlaceholderMaterial':PlaceholderMaterial,
 	# Occluder3D.
 	'Occluder3D':Occluder3D, 'ArrayOccluder3D':ArrayOccluder3D, 'BoxOccluder3D':BoxOccluder3D, 'PolygonOccluder3D':PolygonOccluder3D, 'QuadOccluder3D':QuadOccluder3D, 'SphereOccluder3D':SphereOccluder3D,
-	# AudioBusLayout / AudioEffect.
+	# AudioBusLayout / AudioEffect / AudioStream.
 	'AudioBusLayout':AudioBusLayout, 'AudioEffect':AudioEffect, 'AudioEffectAmplify':AudioEffectAmplify, 'AudioEffectChorus':AudioEffectChorus, 'AudioEffectCompressor':AudioEffectCompressor, 'AudioEffectDelay':AudioEffectDelay, 'AudioEffectDistortion':AudioEffectDistortion, 'AudioEffectReverb':AudioEffectReverb, 'AudioEffectPhaser':AudioEffectPhaser, 'AudioEffectFilter':AudioEffectFilter,
-	# AudioStream.
 	'AudioStream':AudioStream, 'AudioStreamGenerator':AudioStreamGenerator, 'AudioStreamGeneratorPlayback':AudioStreamGeneratorPlayback, 'AudioStreamInteractive':AudioStreamInteractive, 'AudioStreamMicrophone':AudioStreamMicrophone, 'AudioStreamMP3':AudioStreamMP3, 'AudioStreamOggVorbis':AudioStreamOggVorbis, 'AudioStreamPlayback':AudioStreamPlayback, 'AudioStreamPlaybackInteractive':AudioStreamPlaybackInteractive, 'AudioStreamPlaybackOggVorbis':AudioStreamPlaybackOggVorbis, 'AudioStreamPlaybackPlaylist':AudioStreamPlaybackPlaylist, 'AudioStreamPlaybackPolyphonic':AudioStreamPlaybackPolyphonic, 'AudioStreamPlaybackResampled':AudioStreamPlaybackResampled, 'AudioStreamPlaybackSynchronized':AudioStreamPlaybackSynchronized,
-	# Shape2D.
+	# Shape.
 	'Shape2D':Shape2D, 'CapsuleShape2D':CapsuleShape2D, 'CircleShape2D':CircleShape2D, 'ConcavePolygonShape2D':ConcavePolygonShape2D, 'ConvexPolygonShape2D':ConvexPolygonShape2D, 'RectangleShape2D':RectangleShape2D, 'SegmentShape2D':SegmentShape2D, 'SeparationRayShape2D':SeparationRayShape2D, 'WorldBoundaryShape2D':WorldBoundaryShape2D,
-	# Shape3D.
 	'BoxShape3D':BoxShape3D, 'CapsuleShape3D':CapsuleShape3D, 'ConcavePolygonShape3D':ConcavePolygonShape3D, 'ConvexPolygonShape3D':ConvexPolygonShape3D, 'CylinderShape3D':CylinderShape3D, 'HeightMapShape3D':HeightMapShape3D, 'SeparationRayShape3D':SeparationRayShape3D, 'SphereShape3D':SphereShape3D, 'WorldBoundaryShape3D':WorldBoundaryShape3D,
-	# Font.
+	# # Theme / StyleBox / Font.
 	'FontFile':FontFile, 'FontVariation':FontVariation, 'SystemFont':SystemFont,
-	# Theme / StyleBox.
 	'Theme':Theme, 'StyleBoxEmpty':StyleBoxEmpty, 'StyleBoxFlat':StyleBoxFlat, 'StyleBoxLine':StyleBoxLine, 'StyleBoxTexture':StyleBoxTexture,
 	# Multiplayer.
 	'SceneMultiplayer':SceneMultiplayer, 'MultiplayerPeer':MultiplayerPeer, 'OfflineMultiplayerPeer':OfflineMultiplayerPeer, 'ENetMultiplayerPeer':ENetMultiplayerPeer, 'MultiplayerPeerExtension':MultiplayerPeerExtension,
 	# InputEvent.
 	'InputEventAction':InputEventAction, 'InputEventJoypadButton':InputEventJoypadButton, 'InputEventJoypadMotion':InputEventJoypadMotion, 'InputEventKey':InputEventKey, 'InputEventMagnifyGesture':InputEventMagnifyGesture, 'InputEventMIDI':InputEventMIDI, 'InputEventMouseButton':InputEventMouseButton, 'InputEventMouseMotion':InputEventMouseMotion, 'InputEventPanGesture':InputEventPanGesture, 'InputEventScreenDrag':InputEventScreenDrag, 'InputEventScreenTouch':InputEventScreenTouch, 'InputEventShortcut':InputEventShortcut,
 	# Misc.
-	'BitMap':BitMap, 'BoneMap':BoneMap, 'ColorPalette':ColorPalette, 'Curve':Curve, 'Curve2D':Curve2D, 'Curve3D':Curve3D, 'CameraAttributes':CameraAttributes, 'CameraAttributesPhysical':CameraAttributesPhysical, 'CameraAttributesPractical':CameraAttributesPractical, 'LabelSettings':LabelSettings, 'SyntaxHighlighter':SyntaxHighlighter, 'CodeHighlighter':CodeHighlighter, 'Translation':Translation, 'OptimizedTranslation':OptimizedTranslation,
+	'BitMap':BitMap, 'BoneMap':BoneMap, 'ColorPalette':ColorPalette, 'Curve':Curve, 'Curve2D':Curve2D, 'Curve3D':Curve3D, 'CameraAttributes':CameraAttributes, 'CameraAttributesPhysical':CameraAttributesPhysical, 'CameraAttributesPractical':CameraAttributesPractical, 'LabelSettings':LabelSettings, 'SyntaxHighlighter':SyntaxHighlighter, 'CodeHighlighter':CodeHighlighter, 'Translation':Translation, 'OptimizedTranslation':OptimizedTranslation, 'PhysicsMaterial':PhysicsMaterial, 'ButtonGroup':ButtonGroup,
 	# Node.
-	'Node':Node, 'Control':Control, 'Node2D':Node2D, 'Node3D':Node3D, 'Camera2D':Camera2D, 'Camera3D':Camera3D, 'AudioStreamPlayer2D':AudioStreamPlayer2D, 'AudioStreamPlayer3D':AudioStreamPlayer3D,
+	'Node':Node,
+	'Window':Window, 'FileDialog':FileDialog, 'AcceptDialog':AcceptDialog, 'ConfirmationDialog':ConfirmationDialog, 'EditorFileDialog':EditorFileDialog, 'ScriptCreateDialog':ScriptCreateDialog, 'Popup':Popup, 'PopupMenu':PopupMenu, 'PopupPanel':PopupPanel,
+	'AudioStreamPlayer':AudioStreamPlayer, 'AudioStreamPlayer2D':AudioStreamPlayer2D, 'AudioStreamPlayer3D':AudioStreamPlayer3D,
+	'CanvasLayer':CanvasLayer, 'CanvasGroup':CanvasGroup, 'CanvasModulate':CanvasModulate, 'Parallax2D':Parallax2D,
+	'Control':Control, 'Node2D':Node2D, 'Node3D':Node3D, 'Camera2D':Camera2D, 'Camera3D':Camera3D,
 }
 
 
