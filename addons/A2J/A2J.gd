@@ -2,6 +2,7 @@
 ## Main API for the Any-JSON plugin.
 class_name A2J extends RefCounted
 
+
 ## Primitive types that do not require handlers.
 const primitive_types:Array[Variant.Type] = [
 	TYPE_NIL,
@@ -143,10 +144,9 @@ static var _process_next_pass_functions:Array[Callable] = []
 static func report_error(error:int, ...translations) -> void:
 	var a2jError_ = A2JTypeHandler.a2jError % 'A2J'
 	var message = error_strings.get(error)
-	if not message:
-		printerr(a2jError_+str(error))
+	if message is not String: printerr(a2jError_+str(error))
 	else:
-		var translated_message = message
+		var translated_message:String = message
 		for tr in translations:
 			if tr is not String: continue
 			translated_message = translated_message.replace('~~', tr)
@@ -171,15 +171,12 @@ static func _to_json(value:Variant, ruleset:=default_ruleset_to) -> Variant:
 	# Get type of value.
 	var type := type_string(typeof(value))
 	var object_class: String
-	if type == 'Object':
-		object_class = A2JUtil.get_class_name(value)
+	if type == 'Object': object_class = A2JUtil.get_class_name(value)
 
 	# If type excluded, return null.
-	if _type_excluded(type, ruleset):
-		return null
+	if _type_excluded(type, ruleset): return null
 	# If class excluded, return null.
-	elif object_class && _class_excluded(object_class, ruleset):
-		return null
+	elif object_class && _class_excluded(object_class, ruleset): return null
 	# If type is primitive, return the value unchanged.
 	if typeof(value) in primitive_types:
 		if value is float && ruleset.get('fppe_mitigation'):
@@ -197,8 +194,7 @@ static func _to_json(value:Variant, ruleset:=default_ruleset_to) -> Variant:
 	var midpoint = ruleset.get('midpoint')
 	if midpoint is Callable:
 		# If returns true, discard conversion.
-		if midpoint.call(value, ruleset) == true:
-			return null
+		if midpoint.call(value, ruleset) == true: return null
 
 	# Return converted value.
 	return handler.to_json(value, ruleset)
@@ -225,17 +221,13 @@ static func _from_json(value, ruleset:=default_ruleset_from, type_details:Dictio
 		type = split_type[0]
 		if split_type.size() == 2: object_class = split_type[1]
 		if type == '': type = 'Dictionary'
-	elif value is Array:
-		type = 'Array'
-	else:
-		type = type_string(typeof(value))
+	elif value is Array: type = 'Array'
+	else: type = type_string(typeof(value))
 
 	# If type excluded, return null.
-	if _type_excluded(type, ruleset):
-		return null
+	if _type_excluded(type, ruleset): return null
 	# If class excluded, return null.
-	elif object_class && _class_excluded(object_class, ruleset):
-		return null
+	elif object_class && _class_excluded(object_class, ruleset): return null
 	# If type is primitive.
 	elif typeof(value) in primitive_types:
 		# If float is a whole number, convert to an int (JSON in Godot converts ints to floats, we need to convert them back).
@@ -253,8 +245,7 @@ static func _from_json(value, ruleset:=default_ruleset_from, type_details:Dictio
 	var midpoint = ruleset.get('midpoint')
 	if midpoint is Callable:
 		# If returns true, discard conversion.
-		if midpoint.call(value, ruleset) == true:
-			return null
+		if midpoint.call(value, ruleset) == true: return null
 
 	# Convert value.
 	var result = handler.from_json(value, ruleset)
@@ -296,6 +287,8 @@ static func _from_json(value, ruleset:=default_ruleset_from, type_details:Dictio
 		result = type_convert(result, type_details.get('type'))
 	# Return result.
 	return result
+
+
 
 
 static func _type_excluded(type:String, ruleset:Dictionary) -> bool:

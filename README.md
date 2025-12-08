@@ -51,7 +51,7 @@ The final downside to this is that you cannot serialize local classes (classes w
 In conclusion, use Any-JSON for fine control & security via [rulesets](#rulesets). If that does not matter to you, use `JSON.from_native`.
 
 ## var_to_str / var_to_bytes
-This has all the issues that `JSON.from_native` has, except it does produce much smaller outputs since it does not have to conform to the JSON standard.
+This has all the issues that `JSON.from_native` has, except it does produce smaller outputs since it does not have to conform to the JSON standard.
 
 # Features
 ## All types handled
