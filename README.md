@@ -99,7 +99,7 @@ All children of the item you are converting are recursively serialized. This mea
 This is a big advantage over some other plugins.
 
 Any-JSON also handles circular references, this means a property can link back to the original object but it will simply be converted to a reference instead of triggering infinite recursion.
-This works by storing an index value (".i" property) for every *unique* object.
+This works by storing an index value (packed within ".type") for every *unique* object.
 
 ## Types preserved
 Any-JSON automatically re-types values to the type of the property it is assigning to in an `Object`, meaning you can serialize objects with strict property types & still guarantee everything will be the correct type upon deserialization.
