@@ -137,7 +137,9 @@ A "ruleset" can be supplied when converting to or from AJSON allowing fine contr
 - `midpoint (Callable(item:Variant, ruleset:Dictionary) -> bool)`: Called right before conversion for every variable & property including nested ones. Returning `true` will permit conversion, returning `false` will discard the conversion for that item.
 
 ## Error logs
-Custom errors are printed to the console when serialization goes wrong. You can access a history of these errors through the `error_stack` property on type handlers that have `print_error` set to true.
+Custom errors are printed to the console when serialization goes wrong. You can access a history of these errors through the `error_stack` property on type handlers.
+
+If you don't want to proactively check these logs, you may use the `A2J.error_server` to connect functions to the error signals provided.
 
 # Preserving data integrity
 Here are a few rules you should follow so that you don't risk losing any data during or after serialization.
