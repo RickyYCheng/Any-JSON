@@ -98,7 +98,7 @@ static var object_registry:Dictionary[StringName,Object] = {
 	# Shader.
 	'Shader':Shader, 'ShaderInclude':ShaderInclude, 'VisualShader':VisualShader, 'VisualShaderNode':VisualShaderNode,
 	# Texture.
-	'Texture':Texture, 'Texture2D':Texture2D, 'AnimatedTexture':AnimatedTexture, 'AtlasTexture':AtlasTexture, 'CameraTexture':CameraTexture, 'CanvasTexture':CanvasTexture, 'CompressedTexture2D':CompressedTexture2D, 'CurveTexture':CurveTexture, 'CurveXYZTexture':CurveXYZTexture, 'DPITexture':DPITexture, 'ExternalTexture':ExternalTexture, 'GradientTexture1D':GradientTexture1D, 'GradientTexture2D':GradientTexture2D, 'ImageTexture':ImageTexture, 'ImageTexture3D':ImageTexture3D, 'MeshTexture':MeshTexture, 'NoiseTexture2D':NoiseTexture2D, 'NoiseTexture3D':NoiseTexture3D, 'PlaceholderTexture2D':PlaceholderTexture2D, 'ViewportTexture':ViewportTexture,
+	'Texture':Texture, 'Texture2D':Texture2D, 'AnimatedTexture':AnimatedTexture, 'AtlasTexture':AtlasTexture, 'CameraTexture':CameraTexture, 'CanvasTexture':CanvasTexture, 'CompressedTexture2D':CompressedTexture2D, 'CurveTexture':CurveTexture, 'CurveXYZTexture':CurveXYZTexture, 'DPITexture':DPITexture, 'ExternalTexture':ExternalTexture, 'Gradient':Gradient, 'GradientTexture1D':GradientTexture1D, 'GradientTexture2D':GradientTexture2D, 'ImageTexture':ImageTexture, 'ImageTexture3D':ImageTexture3D, 'MeshTexture':MeshTexture, 'NoiseTexture2D':NoiseTexture2D, 'NoiseTexture3D':NoiseTexture3D, 'PlaceholderTexture2D':PlaceholderTexture2D, 'ViewportTexture':ViewportTexture,
 	# Animation.
 	'Animation':Animation, 'AnimationLibrary':AnimationLibrary, 'AnimationNode':AnimationNode, 'AnimationNodeAdd2':AnimationNodeAdd2, 'AnimationNodeAdd3':AnimationNodeAdd3, 'AnimationNodeAnimation':AnimationNodeAnimation, 'AnimationNodeBlend2':AnimationNodeBlend2, 'AnimationNodeBlend3':AnimationNodeBlend3, 'AnimationNodeBlendSpace1D':AnimationNodeBlendSpace1D, 'AnimationNodeBlendSpace2D':AnimationNodeBlendSpace2D, 'AnimationNodeBlendTree':AnimationNodeBlendTree, 'AnimationNodeExtension':AnimationNodeExtension, 'AnimationNodeOneShot':AnimationNodeOneShot, 'AnimationNodeOutput':AnimationNodeOutput, 'AnimationNodeStateMachine':AnimationNodeStateMachine,
 	# Mesh.
@@ -113,13 +113,15 @@ static var object_registry:Dictionary[StringName,Object] = {
 	# Shape.
 	'Shape2D':Shape2D, 'CapsuleShape2D':CapsuleShape2D, 'CircleShape2D':CircleShape2D, 'ConcavePolygonShape2D':ConcavePolygonShape2D, 'ConvexPolygonShape2D':ConvexPolygonShape2D, 'RectangleShape2D':RectangleShape2D, 'SegmentShape2D':SegmentShape2D, 'SeparationRayShape2D':SeparationRayShape2D, 'WorldBoundaryShape2D':WorldBoundaryShape2D,
 	'BoxShape3D':BoxShape3D, 'CapsuleShape3D':CapsuleShape3D, 'ConcavePolygonShape3D':ConcavePolygonShape3D, 'ConvexPolygonShape3D':ConvexPolygonShape3D, 'CylinderShape3D':CylinderShape3D, 'HeightMapShape3D':HeightMapShape3D, 'SeparationRayShape3D':SeparationRayShape3D, 'SphereShape3D':SphereShape3D, 'WorldBoundaryShape3D':WorldBoundaryShape3D,
-	# # Theme / StyleBox / Font.
+	# Theme / StyleBox / Font.
 	'FontFile':FontFile, 'FontVariation':FontVariation, 'SystemFont':SystemFont,
 	'Theme':Theme, 'StyleBoxEmpty':StyleBoxEmpty, 'StyleBoxFlat':StyleBoxFlat, 'StyleBoxLine':StyleBoxLine, 'StyleBoxTexture':StyleBoxTexture,
 	# Multiplayer.
 	'SceneMultiplayer':SceneMultiplayer, 'MultiplayerPeer':MultiplayerPeer, 'OfflineMultiplayerPeer':OfflineMultiplayerPeer, 'ENetMultiplayerPeer':ENetMultiplayerPeer, 'MultiplayerPeerExtension':MultiplayerPeerExtension,
 	# InputEvent.
 	'InputEventAction':InputEventAction, 'InputEventJoypadButton':InputEventJoypadButton, 'InputEventJoypadMotion':InputEventJoypadMotion, 'InputEventKey':InputEventKey, 'InputEventMagnifyGesture':InputEventMagnifyGesture, 'InputEventMIDI':InputEventMIDI, 'InputEventMouseButton':InputEventMouseButton, 'InputEventMouseMotion':InputEventMouseMotion, 'InputEventPanGesture':InputEventPanGesture, 'InputEventScreenDrag':InputEventScreenDrag, 'InputEventScreenTouch':InputEventScreenTouch, 'InputEventShortcut':InputEventShortcut,
+	# Noise.
+	'FastNoiseLite': FastNoiseLite,
 	# Misc.
 	'BitMap':BitMap, 'BoneMap':BoneMap, 'ColorPalette':ColorPalette, 'Curve':Curve, 'Curve2D':Curve2D, 'Curve3D':Curve3D, 'CameraAttributes':CameraAttributes, 'CameraAttributesPhysical':CameraAttributesPhysical, 'CameraAttributesPractical':CameraAttributesPractical, 'LabelSettings':LabelSettings, 'SyntaxHighlighter':SyntaxHighlighter, 'CodeHighlighter':CodeHighlighter, 'Translation':Translation, 'OptimizedTranslation':OptimizedTranslation, 'PhysicsMaterial':PhysicsMaterial, 'ButtonGroup':ButtonGroup,
 	# Node.
@@ -150,7 +152,7 @@ static func report_error(error:int, ...translations) -> void:
 	if message is not String: printerr(a2jError_+str(error))
 	else:
 		for tr in translations:
-			if tr is not String: continue
+			if tr is not String && tr is not StringName: continue
 			message = message.replace('~~', tr)
 		printerr(a2jError_+message)
 

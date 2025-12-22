@@ -33,7 +33,7 @@ func report_error(error:int, ...translations) -> void:
 	else:
 		# Translate error message.
 		for tr in translations:
-			if tr is not String: continue
+			if tr is not String && tr is not StringName: continue
 			message = message.replace('~~', tr)
 		printerr(a2jError_+message)
 
